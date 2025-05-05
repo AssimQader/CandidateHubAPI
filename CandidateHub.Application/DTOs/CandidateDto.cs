@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CandidateHub.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,14 @@ namespace CandidateHub.Application.DTOs
 {
     public class CandidateDto
     {
-
+        //public Guid Id { get; set; }
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
+        public required string Email { get; set; }
+        public required string PhoneNumber { get; set; }
+        public TimeIntervalPreference? CallTimePreference { get; set; }
+        public string? LinkedInUrl { get; set; }
+        public string? GitHubUrl { get; set; }
+        public string? Comments { get; set; }
     }
 }
