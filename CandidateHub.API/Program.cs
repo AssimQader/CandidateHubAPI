@@ -2,8 +2,10 @@
 using CandidateHub.Application.Interfaces.Services;
 using CandidateHub.Application.Services;
 using CandidateHub.Domain.Interfaces.Repos;
+using CandidateHub.Domain.Interfaces.Services;
 using CandidateHub.Infrastructure.Data;
 using CandidateHub.Infrastructure.Repos;
+using CandidateHub.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CandidateHub.API
@@ -23,6 +25,7 @@ namespace CandidateHub.API
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ICandidateService, CandidateService>();
+            builder.Services.AddScoped<ICacheService, CacheService>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

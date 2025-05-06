@@ -3,16 +3,19 @@ using CandidateHub.Application.Interfaces.Services;
 using CandidateHub.Application.Mappings;
 using CandidateHub.Domain.Entities;
 using CandidateHub.Domain.Interfaces.Repos;
+using CandidateHub.Domain.Interfaces.Services;
 
 namespace CandidateHub.Application.Services
 {
     public class CandidateService : ICandidateService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICacheService _cacheService;
 
-        public CandidateService(IUnitOfWork unitOfWork)
+        public CandidateService(IUnitOfWork unitOfWork, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
+            _cacheService = cacheService;
         }
 
         public async Task<CandidateDto> CreateOrUpdateCandidateAsync(CandidateDto dto)
@@ -32,6 +35,10 @@ namespace CandidateHub.Application.Services
                     await repo.AddAsync(entity);
                     await _unitOfWork.CommitAsync();
 
+                    // invalidate cache as new candidate is added
+                    _cacheService.Remove($"candidate:{normalizedEmail}");
+                    _cacheService.Remove("candidates:all");
+
                     return entity.ToDto();
                 }
                 else
@@ -48,6 +55,10 @@ namespace CandidateHub.Application.Services
                     repo.Update(modelDb);
                     await _unitOfWork.CommitAsync();
 
+                    // invalidate cache as an old candidat is updated
+                    _cacheService.Remove($"candidate:{normalizedEmail}");
+                    _cacheService.Remove("candidates:all");
+
                     return modelDb.ToDto();
                 }
             }
@@ -57,20 +68,34 @@ namespace CandidateHub.Application.Services
             }
         }
 
+
         public async Task<CandidateDto?> GetCandidateByEmailAsync(string email)
         {
             try
             {
                 string normalizedEmail = email.Trim().ToLowerInvariant();
+                string cacheKey = $"candidate:{normalizedEmail}";
+
+                var cached = await _cacheService.GetAsync<CandidateDto>(cacheKey);
+                if (cached != null)
+                    return cached;
+
+
                 Candidate? modelDb = await _unitOfWork.Repository<Candidate>()
                     .FindAsync(c => c.Email.ToLowerInvariant() == normalizedEmail);
 
+
                 if (modelDb == null)
                 {
-                    return null;
+                    CandidateDto emptyDto = new();
+                    await _cacheService.SetAsync(cacheKey, emptyDto, TimeSpan.FromMinutes(5));
+                    return emptyDto;
                 }
 
-                return modelDb.ToDto();
+                CandidateDto dto = modelDb.ToDto();
+                await _cacheService.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(5));
+                
+                return dto;
             }
             catch (Exception ex)
             {
@@ -78,17 +103,31 @@ namespace CandidateHub.Application.Services
             }
         }
 
+
         public async Task<IEnumerable<CandidateDto>?> GetAllCandidatesAsync()
         {
             try
             {
+                string cacheKey = "candidates:all";
+                var cached = await _cacheService.GetAsync<IEnumerable<CandidateDto>>(cacheKey);
+                if (cached != null)
+                    return cached;
+
                 IEnumerable<Candidate>? candidates = await _unitOfWork.Repository<Candidate>().GetAllAsync();
+
                 if (!candidates.Any())
                 {
-                    return null;
+                    // cache and return an empty list
+                    List<CandidateDto> emptyList = new();
+                    await _cacheService.SetAsync(cacheKey, emptyList, TimeSpan.FromMinutes(10));
+                    return emptyList;
                 }
 
-                return candidates.Select(c => c.ToDto());
+
+                List<CandidateDto> dtoList = candidates.Select(c => c.ToDto()).ToList();
+                await _cacheService.SetAsync(cacheKey, dtoList, TimeSpan.FromMinutes(10));
+                
+                return dtoList;
             }
             catch (Exception ex)
             {
