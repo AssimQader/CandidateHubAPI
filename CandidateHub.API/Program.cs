@@ -26,6 +26,8 @@ namespace CandidateHub.API
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ICandidateService, CandidateService>();
             builder.Services.AddScoped<ICacheService, CacheService>();
+            
+            builder.Services.AddMemoryCache();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

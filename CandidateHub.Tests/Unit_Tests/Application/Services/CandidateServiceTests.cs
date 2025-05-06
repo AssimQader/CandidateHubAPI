@@ -59,7 +59,7 @@ namespace CandidateHub.Tests.Unit_Tests.Application.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(dto.Email.ToLowerInvariant(), result.Email.ToLowerInvariant());
+            Assert.Equal(dto.Email.ToLower(), result.Email.ToLower());
         }
 
 
@@ -97,7 +97,7 @@ namespace CandidateHub.Tests.Unit_Tests.Application.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(dto.Email.ToLowerInvariant(), result.Email.ToLowerInvariant());
+            Assert.Equal(dto.Email.ToLower(), result.Email.ToLower());
         }
 
 
@@ -115,7 +115,7 @@ namespace CandidateHub.Tests.Unit_Tests.Application.Services
             CandidateDto? result = await _candidateService.GetCandidateByEmailAsync("asem.adel00@gmail.com");
 
             Assert.NotNull(result);
-            Assert.Equal(candidate.Email.ToLowerInvariant(), result.Email.ToLowerInvariant());
+            Assert.Equal(candidate.Email.ToLower(), result.Email.ToLower());
         }
 
 
@@ -234,7 +234,7 @@ namespace CandidateHub.Tests.Unit_Tests.Application.Services
         public async Task GetCandidateByEmailAsync_ShouldFetchFromRepoAndSetCache_WhenNotInCache()
         {
             string email = "notincache@example.com";
-            string normalizedEmail = email.ToLowerInvariant();
+            string normalizedEmail = email.ToLower();
            
             string cacheKey = $"candidate:{normalizedEmail}";
 
@@ -262,7 +262,7 @@ namespace CandidateHub.Tests.Unit_Tests.Application.Services
 
           
             Assert.NotNull(result);
-            Assert.Equal(email.ToLowerInvariant(), result.Email.ToLowerInvariant());
+            Assert.Equal(email.ToLower(), result.Email.ToLower());
 
             _cacheServiceMock.Verify(c => c.GetAsync<CandidateDto>(cacheKey), Times.Once);
             _cacheServiceMock.Verify(c => c.SetAsync(

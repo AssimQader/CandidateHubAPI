@@ -22,9 +22,9 @@ namespace CandidateHub.Application.Services
         {
             try
             {
-                string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+                string normalizedEmail = dto.Email.Trim().ToLower();
                 IGenericRepository<Candidate> repo = _unitOfWork.Repository<Candidate>();
-                Candidate? modelDb = await repo.FindAsync(c => c.Email.ToLowerInvariant() == normalizedEmail);
+                Candidate? modelDb = await repo.FindAsync(c => c.Email.ToLower() == normalizedEmail);
 
                 if (modelDb is null)
                 {
@@ -73,7 +73,7 @@ namespace CandidateHub.Application.Services
         {
             try
             {
-                string normalizedEmail = email.Trim().ToLowerInvariant();
+                string normalizedEmail = email.Trim().ToLower();
                 string cacheKey = $"candidate:{normalizedEmail}";
 
                 var cached = await _cacheService.GetAsync<CandidateDto>(cacheKey);
@@ -82,7 +82,7 @@ namespace CandidateHub.Application.Services
 
 
                 Candidate? modelDb = await _unitOfWork.Repository<Candidate>()
-                    .FindAsync(c => c.Email.ToLowerInvariant() == normalizedEmail);
+                    .FindAsync(c => c.Email.ToLower() == normalizedEmail);
 
 
                 if (modelDb == null)
