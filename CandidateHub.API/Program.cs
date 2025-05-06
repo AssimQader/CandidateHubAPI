@@ -46,6 +46,15 @@ namespace CandidateHub.API
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                CandidateHubDbContext dbContext = scope.ServiceProvider.GetRequiredService<CandidateHubDbContext>();
+
+                dbContext.Database.Migrate();            
+                CandidateSeeder.Seed(dbContext);    
+            }
+
             app.Run();
         }
     }
