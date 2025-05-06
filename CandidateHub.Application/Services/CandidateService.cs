@@ -21,7 +21,7 @@ namespace CandidateHub.Application.Services
             {
                 string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
                 IGenericRepository<Candidate> repo = _unitOfWork.Repository<Candidate>();
-                Candidate? modelDb = await repo.FindAsync(c => c.Email.ToLower() == normalizedEmail);
+                Candidate? modelDb = await repo.FindAsync(c => c.Email.ToLowerInvariant() == normalizedEmail);
 
                 if (modelDb is null)
                 {
@@ -63,7 +63,7 @@ namespace CandidateHub.Application.Services
             {
                 string normalizedEmail = email.Trim().ToLowerInvariant();
                 Candidate? modelDb = await _unitOfWork.Repository<Candidate>()
-                    .FindAsync(c => c.Email.ToLower() == normalizedEmail);
+                    .FindAsync(c => c.Email.ToLowerInvariant() == normalizedEmail);
 
                 if (modelDb == null)
                 {
@@ -78,7 +78,7 @@ namespace CandidateHub.Application.Services
             }
         }
 
-        public async Task<IEnumerable<CandidateDto>> GetAllCandidatesAsync()
+        public async Task<IEnumerable<CandidateDto>?> GetAllCandidatesAsync()
         {
             try
             {

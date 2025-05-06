@@ -10,10 +10,10 @@ namespace CandidateHub.Application.DTOs
     public class CandidateDto
     {
         //public Guid Id { get; set; }
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public required string Email { get; set; }
-        public required string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public TimeIntervalPreference? CallTimePreference { get; set; }
         public string? LinkedInUrl { get; set; }
         public string? GitHubUrl { get; set; }

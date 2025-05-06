@@ -26,6 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CandidateHub.Application\CandidateHub.Application.csproj" />
+    <ProjectReference Include="..\CandidateHub.Domain\CandidateHub.Domain.csproj" />
+    <ProjectReference Include="..\CandidateHub.Infrastructure\CandidateHub.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

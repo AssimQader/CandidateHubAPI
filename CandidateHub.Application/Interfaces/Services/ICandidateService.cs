@@ -11,6 +11,6 @@ namespace CandidateHub.Application.Interfaces.Services
     {
         Task<CandidateDto> CreateOrUpdateCandidateAsync(CandidateDto dto);
         Task<CandidateDto?> GetCandidateByEmailAsync(string email);
-        Task<IEnumerable<CandidateDto>> GetAllCandidatesAsync();
+        Task<IEnumerable<CandidateDto>?> GetAllCandidatesAsync();
     }
 }

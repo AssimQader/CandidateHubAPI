@@ -1,7 +1,6 @@
 ﻿using CandidateHub.API.Models;
 using CandidateHub.Application.DTOs;
 using CandidateHub.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CandidateHub.API.Controllers
@@ -40,7 +39,7 @@ namespace CandidateHub.API.Controllers
 
             try
             {
-                var result = await _candidateService.CreateOrUpdateCandidateAsync(candidateDto);
+                CandidateDto? result = await _candidateService.CreateOrUpdateCandidateAsync(candidateDto);
                 return Ok(ApiResponse<CandidateDto>.Success(result, "Candidate saved successfully"));
             }
             catch (ApplicationException ex)
@@ -61,9 +60,9 @@ namespace CandidateHub.API.Controllers
         {
             try
             {
-                var candidate = await _candidateService.GetCandidateByEmailAsync(email);
+                CandidateDto? candidate = await _candidateService.GetCandidateByEmailAsync(email);
                 if (candidate == null)
-                    return NotFound(ApiResponse<CandidateDto>.Success(default, "Candidate not found"));
+                    return NotFound(ApiResponse<CandidateDto>.Success(default, "Candidate not found!"));
 
                 return Ok(ApiResponse<CandidateDto>.Success(candidate, "Candidate retrieved successfully"));
             }
@@ -82,7 +81,11 @@ namespace CandidateHub.API.Controllers
         {
             try
             {
-                var candidates = await _candidateService.GetAllCandidatesAsync();
+                IEnumerable<CandidateDto> candidates = await _candidateService.GetAllCandidatesAsync();
+                
+                if (candidates == null || !candidates.Any())
+                    return NotFound(ApiResponse<IEnumerable<CandidateDto>>.Success(default, "No candidates found!"));   
+
                 return Ok(ApiResponse<IEnumerable<CandidateDto>>.Success(candidates, "Candidates retrieved successfully"));
             }
             catch (Exception ex)
