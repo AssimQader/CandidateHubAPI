@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CandidateHub.Infrastructure.Migrations
 {
     [DbContext(typeof(CandidateHubDbContext))]
-    [Migration("20250505185011_init")]
+    [Migration("20250506183607_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -73,6 +73,9 @@ namespace CandidateHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Candidate");
                 });

@@ -18,6 +18,14 @@ namespace CandidateHub.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Candidate>().HasIndex(c => c.Email).IsUnique(); // adds a non-clustered unique index
+
+
+            modelBuilder.Entity<Candidate>().Property(c => c.Email)
+                .IsRequired()
+                .HasMaxLength(150);
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -31,6 +31,12 @@ namespace CandidateHub.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Candidate", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Candidate_Email",
+                table: "Candidate",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />

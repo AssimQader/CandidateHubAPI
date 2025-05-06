@@ -1,10 +1,12 @@
 ﻿using CandidateHub.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CandidateHub.Domain.Entities
 {
     [Table("Candidate")]
+    [Index(nameof(Email), IsUnique = true)]
     public class Candidate
     {
         [Key]
@@ -17,6 +19,7 @@ namespace CandidateHub.Domain.Entities
         [Required]
         [MaxLength(100)]
         public string LastName { get; set; }
+
 
         [Required]
         [MaxLength(150)]

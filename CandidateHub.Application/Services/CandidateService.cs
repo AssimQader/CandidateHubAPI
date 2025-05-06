@@ -18,56 +18,76 @@ namespace CandidateHub.Application.Services
             _cacheService = cacheService;
         }
 
-        public async Task<CandidateDto> CreateOrUpdateCandidateAsync(CandidateDto dto)
+
+        #region Helper Methods
+        private static async Task<bool> EmailExistsAsync(string email, IGenericRepository<Candidate> repo)
         {
-            try
-            {
-                string normalizedEmail = dto.Email.Trim().ToLower();
-                IGenericRepository<Candidate> repo = _unitOfWork.Repository<Candidate>();
-                Candidate? modelDb = await repo.FindAsync(c => c.Email.ToLower() == normalizedEmail);
+            Candidate? existing = await repo.FindAsync(c => c.Email == email);
 
-                if (modelDb is null)
-                {
-                    var entity = dto.ToEntity();
-                    entity.Email = normalizedEmail;
-                    entity.CreatedAt = DateTime.UtcNow;
-
-                    await repo.AddAsync(entity);
-                    await _unitOfWork.CommitAsync();
-
-                    // invalidate cache as new candidate is added
-                    _cacheService.Remove($"candidate:{normalizedEmail}");
-                    _cacheService.Remove("candidates:all");
-
-                    return entity.ToDto();
-                }
-                else
-                {
-                    modelDb.FirstName = dto.FirstName;
-                    modelDb.LastName = dto.LastName;
-                    modelDb.PhoneNumber = dto.PhoneNumber;
-                    modelDb.CallTimePreference = dto.CallTimePreference;
-                    modelDb.LinkedInUrl = dto.LinkedInUrl;
-                    modelDb.GitHubUrl = dto.GitHubUrl;
-                    modelDb.Comments = dto.Comments;
-                    modelDb.UpdatedAt = DateTime.UtcNow;
-
-                    repo.Update(modelDb);
-                    await _unitOfWork.CommitAsync();
-
-                    // invalidate cache as an old candidat is updated
-                    _cacheService.Remove($"candidate:{normalizedEmail}");
-                    _cacheService.Remove("candidates:all");
-
-                    return modelDb.ToDto();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"Error occurred while processing the candidate record : {ex.Message}");
-            }
+            return existing != null;
         }
 
+        private void InvalidateCache(string emailKey)
+        {
+            _cacheService.Remove($"candidate:{emailKey}");
+            _cacheService.Remove("candidates:all");
+        }
+
+        private async Task<CandidateDto> CreateCandidateAsync(CandidateDto dto, string normalizedEmail, IGenericRepository<Candidate> repo)
+        {
+            Candidate candidateDb = dto.ToEntity();
+            candidateDb.Email = normalizedEmail;
+            candidateDb.CreatedAt = DateTime.UtcNow;
+
+            await repo.AddAsync(candidateDb);
+            await _unitOfWork.CommitAsync();
+
+            InvalidateCache(normalizedEmail);
+
+            return candidateDb.ToDto();
+        }
+
+        private async Task<CandidateDto> UpdateCandidateAsync(CandidateDto dto, string normalizedEmail, IGenericRepository<Candidate> repo)
+        {
+            Candidate? modelDb = await repo.FindAsync(c => c.Email == normalizedEmail);
+
+            modelDb.FirstName = dto.FirstName;
+            modelDb.LastName = dto.LastName;
+            modelDb.PhoneNumber = dto.PhoneNumber;
+            modelDb.CallTimePreference = dto.CallTimePreference;
+            modelDb.LinkedInUrl = dto.LinkedInUrl;
+            modelDb.GitHubUrl = dto.GitHubUrl;
+            modelDb.Comments = dto.Comments;
+            modelDb.UpdatedAt = DateTime.UtcNow;
+            modelDb.Email = normalizedEmail;
+
+            repo.Update(modelDb);
+            await _unitOfWork.CommitAsync();
+
+            InvalidateCache(normalizedEmail);
+
+            return modelDb.ToDto();
+        } 
+        #endregion
+
+
+        public async Task<CandidateDto> CreateOrUpdateCandidateAsync(CandidateDto dto)
+        {
+            string normalizedEmail = dto.Email.Trim().ToLower();
+            
+            var repo = _unitOfWork.Repository<Candidate>();
+
+            bool exist =  await EmailExistsAsync(normalizedEmail, repo);
+
+            if (!exist) // candidate not exists in db
+            {
+                return await CreateCandidateAsync(dto, normalizedEmail, repo);
+            }
+            else
+            {
+                return await UpdateCandidateAsync(dto, normalizedEmail, repo);
+            }
+        }
 
         public async Task<CandidateDto?> GetCandidateByEmailAsync(string email)
         {
@@ -102,7 +122,6 @@ namespace CandidateHub.Application.Services
                 throw new ApplicationException($"Failed to fetch candidate information : {ex.Message}");
             }
         }
-
 
         public async Task<IEnumerable<CandidateDto>?> GetAllCandidatesAsync()
         {
