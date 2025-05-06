@@ -26,6 +26,7 @@ namespace CandidateHub.Domain.Entities
         [Required]
         [MaxLength(20)]
         [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format!")]
+
         public string PhoneNumber { get; set; }
 
         public TimeIntervalPreference? CallTimePreference { get; set; }
