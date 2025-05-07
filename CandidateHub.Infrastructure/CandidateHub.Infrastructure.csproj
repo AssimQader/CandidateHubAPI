@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CandidateHub.Application\CandidateHub.Application.csproj" />
     <ProjectReference Include="..\CandidateHub.Domain\CandidateHub.Domain.csproj" />
   </ItemGroup>
 

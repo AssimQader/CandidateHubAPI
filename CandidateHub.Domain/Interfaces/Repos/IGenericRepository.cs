@@ -9,7 +9,7 @@ namespace CandidateHub.Domain.Interfaces.Repos
 {
     public interface IGenericRepository<T> where T : class
     {
-        IQueryable<T> AsQueryable(); // Returns an IQueryable of Entity Type T (deffered execution)
+        IQueryable<T> AsQueryable(); // returns an IQueryable of Entity Type T (deffered execution)
 
         Task<T?> GetByIdAsync(int id);
         

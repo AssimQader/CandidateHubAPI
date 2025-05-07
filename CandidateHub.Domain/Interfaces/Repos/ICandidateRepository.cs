@@ -9,6 +9,6 @@ namespace CandidateHub.Domain.Interfaces.Repos
 {
     public interface ICandidateRepository : IGenericRepository<Candidate>
     {
-        Task<Candidate?> GetByEmailAsync(string email); // adds a candidate-specific query over the generic repository.
+        Task<Candidate?> GetByEmailAsync(string email);
     }
 }

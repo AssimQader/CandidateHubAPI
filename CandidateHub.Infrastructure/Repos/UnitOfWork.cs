@@ -28,12 +28,16 @@ namespace CandidateHub.Infrastructure.Repos
             }
 
             // Resolve the generic repo from the DI container
-            var repository = (IGenericRepository<T>)Activator.CreateInstance(
+            IGenericRepository<T> repository = (IGenericRepository<T>)Activator.CreateInstance(
                 typeof(GenericRepository<>).MakeGenericType(typeof(T)), _context)!;
 
-            _repositories.TryAdd(typeof(T), repository);
+            _repositories.TryAdd(typeof(T), repository); 
+
             return repository;
         }
+
+
+
 
         public async Task<int> CommitAsync()
         {
@@ -69,7 +73,6 @@ namespace CandidateHub.Infrastructure.Repos
                 throw;
             }
         }
-
 
         public int Commit()
         {
